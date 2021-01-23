@@ -52,14 +52,15 @@ def main():
             if detector:
                 image.ret_candidate = detector.detect(image)
             if decoder:
-                messages = decoder.decode(image)
-                results.extend(messages)
+                message = decoder.decode(image)
+                if message:
+                    results.append(message)
             count += 1
 
-    results_set = set(results)
-    print("Detect Method: {} \n Decode Method: {} \n Zxing Enable: {} \n Data Set: {} \n Results: {}/{} \n Accurate: {}"
-          .format(cfg.DETECTOR.METHOD, cfg.DECODER.METHOD, cfg.DECODER.ARG.zxing_enable, cfg.TARGET,
-                  len(results_set), count, len(results_set)/count))
+    if decoder and cfg.DECODER.ARG.zxing_enable:
+        print("Detect Method: {} \n Decode Method: {} \n Zxing Enable: {} \n Data Set: {} \n Results: {}/{} \n "
+              "Accurate: {}".format(cfg.DETECTOR.METHOD, cfg.DECODER.METHOD, cfg.DECODER.ARG.zxing_enable,
+                                    cfg.TARGET, len(results), count, len(results)/count))
 
 
 if __name__ == '__main__':

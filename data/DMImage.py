@@ -47,10 +47,10 @@ class DMImage:
             self.img = cv2.resize(self.img, tuple(img_size),
                                   interpolation=cv2.INTER_LINEAR)
 
-        if img_size[1] > self.cfg.MAX_SIZE:
+        if img_size[idx_order[1]] > self.cfg.MAX_SIZE:
             resize_rate = self.cfg.MAX_SIZE / img_size[idx_order[1]]
-            img_size = (img_size * resize_rate).astype(int)
-            self.img = cv2.resize(self.img, tuple(img_size),
+            h, w = (img_size * resize_rate).astype(int)
+            self.img = cv2.resize(self.img, (w, h),
                                   interpolation=cv2.INTER_LINEAR)
         self.img_size = self.img.shape[:2]
         return
