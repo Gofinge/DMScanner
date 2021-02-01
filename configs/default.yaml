@@ -1,8 +1,8 @@
 # Author: Xiaoyang Wu (xiaoyang.wu@smartmore.com)
 # Basic
 NAME: "JHT"
-SOURCE_DIR: "//192.168.10.100/Gofinge/Documents/Data/barcode_2d"
-DATASET: {"JHT": "JHT", "halcon": "'halcon/ecc200", "dot_DM": "dot_datamatrix"}
+SOURCE_DIR: "//192.168.6.186/SMore-X/bench_mark/twod/datamatrix"
+DATASET: {"JHT": "JHT/data", "halcon": "'ecc200", "dot_DM": "dot_datamatrix/data"}
 TARGET: "JHT"
 OUTPUT_DIR: "results"
 USE_BAR: True
@@ -23,7 +23,7 @@ DECODER:
 
 # Image
 IMAGE:
-  MAX_SIZE: 512
+  MAX_SIZE: 300
   MIN_SIZE: 256
   BINARIZER:
     METHOD: "general"

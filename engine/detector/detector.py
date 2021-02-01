@@ -1,7 +1,8 @@
 from data import DMImage
 from utils.registry import Registry
 from .gradient_edge_detector import dm_gradient_edge_detector
-from .dev_detector import dm_dev_detector
+from .entropy_detector import dm_entropy_detector
+from .dev_detector import dev_detector
 
 
 class DMDetector:
@@ -10,7 +11,8 @@ class DMDetector:
         self.output_dir = output_dir
         self.DETECTOR = Registry()
         self.DETECTOR.register("gradient-edge", dm_gradient_edge_detector)
-        self.DETECTOR.register("dev", dm_dev_detector)
+        self.DETECTOR.register("entropy", dm_entropy_detector)
+        self.DETECTOR.register("dev", dev_detector)
 
     def detect(self, dm_image: DMImage):
         return self.DETECTOR[self.cfg.METHOD](dm_image=dm_image, output_dir=self.output_dir, **self.cfg.ARG)

@@ -47,12 +47,12 @@ def main():
     results = []
     count = 0
     bar = TqdmBar(dataset, dataset.__len__(), description="DM Scanner", use_bar=cfg.USE_BAR)
-    for _, image in bar.bar:
-        if image:
+    for _, dm_image in bar.bar:
+        if dm_image.img is not None:
             if detector:
-                image.ret_candidate = detector.detect(image)
+                dm_image.ret_candidate = detector.detect(dm_image)
             if decoder:
-                message = decoder.decode(image)
+                message = decoder.decode(dm_image)
                 if message:
                     results.append(message)
             count += 1

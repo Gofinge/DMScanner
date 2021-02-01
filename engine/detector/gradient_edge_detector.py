@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 from utils.miscellaneous import get_center, calc_euclidean_distance, cal_iou
 from utils.augmentation import normalize
+from utils.vis import image_show
 
 
 def dm_gradient_edge_detector(dm_image, output_dir, **kwargs):
@@ -30,6 +31,8 @@ def dm_gradient_edge_detector(dm_image, output_dir, **kwargs):
 
     for level in range(len(dm_image.gray_pyramid)):
         image = dm_image.gray_pyramid[level]
+        if level == 0:
+            image_show(image, "raw")
         image_smoothed = cv2.bilateralFilter(image, d=13, sigmaColor=46, sigmaSpace=8)
         # gradient
         gradient_w = cv2.filter2D(image_smoothed, cv2.CV_32F, w_sobel_kernel)
@@ -37,7 +40,8 @@ def dm_gradient_edge_detector(dm_image, output_dir, **kwargs):
         gradient_scale_o = np.sqrt(gradient_w ** 2 + gradient_h ** 2)
         gradient_scale_o[gradient_scale_o > 255] = 255
         gradient_scale_o = normalize(gradient_scale_o)
-        gradient_scale_o = normalize(gradient_scale_o)
+        if level == 0:
+            image_show(gradient_scale_o, "gradient_norm")
 
         # local threshold.
         gradient_scale = gradient_scale_o > cv2.blur(gradient_scale_o, ksize=(block_size, block_size)) + thread_offset

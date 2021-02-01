@@ -1,8 +1,8 @@
 # Author: Xiaoyang Wu (xiaoyang.wu@smartmore.com)
 # Basic
-NAME: "JHT-detect"
-SOURCE_DIR: "//192.168.10.100/Gofinge/Documents/Data/barcode_2d"
-DATASET: {"JHT": "JHT", "halcon": "'halcon/ecc200", "dot_DM": "dot_datamatrix"}
+NAME: "halcon-detect"
+SOURCE_DIR: "//192.168.6.186/SMore-X/bench_mark/twod/datamatrix"
+DATASET: {"JHT": "JHT/data", "halcon": "halcon/ecc200", "dot_DM": "dot_datamatrix"}
 TARGET: "JHT"
 OUTPUT_DIR: "results"
 USE_BAR: True
@@ -10,7 +10,7 @@ USE_BAR: True
 # Detector
 DETECTOR:
   ENABLE: True
-  # support method: "general", "gradient-edg", "max-min"
+  # support method: "general", "gradient-edge", "max-min"
   METHOD: "dev"
   ARG: {}
 
@@ -19,11 +19,11 @@ DECODER:
   ENABLE: False
   METHOD: "line-cycle-zxing"
   ARG:
-    zxing_enable: False
+    zxing_enable: True
 
 # Image
 IMAGE:
-  MAX_SIZE: 512
+  MAX_SIZE: 400
   MIN_SIZE: 256
   BINARIZER:
     METHOD: "general"

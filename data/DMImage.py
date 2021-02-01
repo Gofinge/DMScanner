@@ -12,9 +12,10 @@ class DMImage:
         self.cfg = cfg
         self.img_path = img_path
         self.img = cv2.imread(self.img_path, 1)
-        self.img_size = self.img.shape[:2]
+
         if self.img is None:
             return
+        self.img_size = self.img.shape[:2]
         # record origin image
         self.origin_img = self.img.copy()
         self.origin_size = self.origin_img.shape[:2]
