@@ -56,6 +56,7 @@ def main():
                 if message:
                     results.append(message)
             count += 1
+            bar.set_postfix({"Correct": len(results), "Total": count})
 
     if decoder and cfg.DECODER.ARG.zxing_enable:
         print("Detect Method: {} \n Decode Method: {} \n Zxing Enable: {} \n Data Set: {} \n Results: {}/{} \n "

@@ -142,46 +142,48 @@ def l_shape_finder(src, rescale_factor=1, regression=False):
         if ratio > 4 or (full_ratio < 0.3):
             continue
         rect_candidate.append(min_rect)
-    if regression:
-        reg_candidate = []
-        for rect in rect_candidate:
-            summation = np.sum(rect, axis=1)
-            max_idx = np.where(summation == max(summation))[0][0]
-            rect_cp = rect.copy()
 
-            rect_cp[0] = rect[max_idx % 4]
-            rect_cp[2] = rect[(max_idx - 2) % 4]
-            if rect[(max_idx - 1) % 4][0] < rect[(max_idx - 3) % 4][0]:
-                rect_cp[3] = rect[(max_idx - 1) % 4]
-                rect_cp[1] = rect[(max_idx - 3) % 4]
-            else:
-                rect_cp[1] = rect[(max_idx - 1) % 4]
-                rect_cp[3] = rect[(max_idx - 3) % 4]
-            rect = rect_cp
-
-            for i in range(4):
-                rect[i][0] = min(w - 1, max(0, rect[i][0]))
-                rect[i][1] = min(h - 1, max(0, rect[i][1]))
-
-            # 2 - - 1
-            # |     |
-            # |     |
-            # 3 - - 0
-            for i in range(4):
-                min_dist = 10000
-                min_point = None
-                for hull in hull_candidate:
-                    for point in hull:
-                        dist = calc_euclidean_distance(rect[i], point)
-                        if min_dist > dist:
-                            min_dist = dist
-                            min_point = point
-
-                rect[i] = min_point
-            reg_candidate.append(rect)
-            rect_candidate = reg_candidate
     for i in range(len(rect_candidate)):
         rect_candidate[i] = rect_candidate[i] * rescale_factor
     for i in range(len(contours)):
         contours[i] = contours[i] * rescale_factor
     return rect_candidate
+
+    # if regression:
+    #     reg_candidate = []
+    #     for rect in rect_candidate:
+    #         summation = np.sum(rect, axis=1)
+    #         max_idx = np.where(summation == max(summation))[0][0]
+    #         rect_cp = rect.copy()
+    #
+    #         rect_cp[0] = rect[max_idx % 4]
+    #         rect_cp[2] = rect[(max_idx - 2) % 4]
+    #         if rect[(max_idx - 1) % 4][0] < rect[(max_idx - 3) % 4][0]:
+    #             rect_cp[3] = rect[(max_idx - 1) % 4]
+    #             rect_cp[1] = rect[(max_idx - 3) % 4]
+    #         else:
+    #             rect_cp[1] = rect[(max_idx - 1) % 4]
+    #             rect_cp[3] = rect[(max_idx - 3) % 4]
+    #         rect = rect_cp
+    #
+    #         for i in range(4):
+    #             rect[i][0] = min(w - 1, max(0, rect[i][0]))
+    #             rect[i][1] = min(h - 1, max(0, rect[i][1]))
+    #
+    #         # 2 - - 1
+    #         # |     |
+    #         # |     |
+    #         # 3 - - 0
+    #         for i in range(4):
+    #             min_dist = 10000
+    #             min_point = None
+    #             for hull in hull_candidate:
+    #                 for point in hull:
+    #                     dist = calc_euclidean_distance(rect[i], point)
+    #                     if min_dist > dist:
+    #                         min_dist = dist
+    #                         min_point = point
+    #
+    #             rect[i] = min_point
+    #         reg_candidate.append(rect)
+    #         rect_candidate = reg_candidate

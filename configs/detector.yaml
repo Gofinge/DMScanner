@@ -2,7 +2,7 @@
 # Basic
 NAME: "halcon-detect"
 SOURCE_DIR: "//192.168.6.186/SMore-X/bench_mark/twod/datamatrix"
-DATASET: {"JHT": "JHT/data", "halcon": "halcon/ecc200", "dot_DM": "dot_datamatrix"}
+DATASET: {"JHT": "JHT/data", "halcon": "ecc200", "dot_DM": "dot_datamatrix"}
 TARGET: "JHT"
 OUTPUT_DIR: "results"
 USE_BAR: True
@@ -12,11 +12,16 @@ DETECTOR:
   ENABLE: True
   # support method: "general", "gradient-edge", "max-min"
   METHOD: "dev"
-  ARG: {}
+  ARG:
+    min_contour_area: 16
+    min_rect_size: [20, 20]
+    color_level: 3
+    pyramid_factor: [1]
+    vis: False
 
 # Decoder
 DECODER:
-  ENABLE: False
+  ENABLE: True
   METHOD: "line-cycle-zxing"
   ARG:
     zxing_enable: True
