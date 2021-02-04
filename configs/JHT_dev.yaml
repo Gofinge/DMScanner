@@ -1,6 +1,6 @@
 # Author: Xiaoyang Wu (xiaoyang.wu@smartmore.com)
 # Basic
-NAME: "halcon-detect"
+NAME: "JHT-gradient-edge"
 SOURCE_DIR: "//192.168.6.186/SMore-X/bench_mark/twod/datamatrix"
 DATASET: {"JHT": "JHT/data", "halcon": "ecc200", "dot_DM": "dot_datamatrix"}
 TARGET: "JHT"
@@ -11,12 +11,17 @@ USE_BAR: True
 DETECTOR:
   ENABLE: True
   # support method: "general", "gradient-edge", "max-min"
-  METHOD: "dev"
+  METHOD: "gradient-edge"
   ARG:
+    num_pyramid_level: 4
     min_contour_area: 16
     min_rect_size: [20, 20]
     color_level: 3
+    contours_in_dilate: True
+    dilate_limit_rate: 0.1
     pyramid_factor: [1]
+    nms: True
+    nms_threshold: 0.9
     vis: False
 
 # Decoder
@@ -25,16 +30,4 @@ DECODER:
   METHOD: "line-cycle-zxing"
   ARG:
     zxing_enable: True
-
-# Image
-IMAGE:
-  MAX_SIZE: 400
-  MIN_SIZE: 256
-  BINARIZER:
-    METHOD: "general"
-    LOCAL_WINDOWS_SIZE: 20
-  GRAYSCALE:
-    METHOD: "general"
-  PYRAMID:
-    FACTOR_LIST: [1, 2, 4]
 

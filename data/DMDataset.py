@@ -3,8 +3,7 @@ from .DMImage import DMImage
 
 
 class DMDataset:
-    def __init__(self, source_dir, cfg):
-        self.cfg = cfg
+    def __init__(self, source_dir):
         self.source_dir = source_dir
         self.image_list = []
         self.extension_write_list = [".png", ".bmp", ".jpg"]
@@ -16,7 +15,7 @@ class DMDataset:
                     self.image_list.append(os.path.join(root, file))
 
     def __getitem__(self, key):
-        return DMImage(self.image_list[key], self.cfg)
+        return DMImage(self.image_list[key])
 
     def __len__(self):
         return len(self.image_list)

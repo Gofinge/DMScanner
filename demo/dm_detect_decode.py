@@ -40,7 +40,7 @@ def main():
         idx += 1
     os.makedirs(output_dir)
     source_dir = os.path.join(cfg.SOURCE_DIR, cfg.DATASET[cfg.TARGET])
-    dataset = DMDataset(source_dir, cfg.IMAGE)
+    dataset = DMDataset(source_dir)
     detector = DMDetector(cfg.DETECTOR, output_dir) if cfg.DETECTOR.ENABLE else None
     decoder = DMDecoder(cfg.DECODER, output_dir) if cfg.DECODER.ENABLE else None
 

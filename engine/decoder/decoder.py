@@ -31,14 +31,11 @@ class DMDecoder:
 def dm_line_cycle_decoder( dm_image, output_dir, zxing_enable=True, **kwargs):
     img = cv2.GaussianBlur(dm_image.gray, (3, 3), 0)
     rets = dm_image.ret_candidate
-    # print('here', img.shape, rets)
     use_avaliable = np.zeros(len(rets))
     count = 0
     messages = []
 
     for ret in rets:
-
-        # print(ret)
         show = False
         if use_avaliable[count] != 0:
             return
@@ -57,7 +54,6 @@ def dm_line_cycle_decoder( dm_image, output_dir, zxing_enable=True, **kwargs):
         if height > width:
             aspect_ratio = 1 / aspect_ratio
         pts2 = np.float32([[0, 0], [width, 0], [width, height], [0, height]])
-        # print(pts1, pts2)
         M = cv2.getPerspectiveTransform(pts1, pts2)
         dst = cv2.warpPerspective(img, M, (width, height))
         search_range_w = width // 10
@@ -65,14 +61,10 @@ def dm_line_cycle_decoder( dm_image, output_dir, zxing_enable=True, **kwargs):
         search_range_h = height // 10
         search_width_h = max(4, search_range_h // 4)
 
-        internal_top, start_end_top, signal_top, num_top = get_signal(dst[:search_range_w, :], width,
-                                                                      search_width_w)
-        internal_btm, start_end_btm, signal_btm, num_btm = get_signal(dst[-search_range_w:, :], width,
-                                                                      search_width_w)
-        internal_lft, start_end_lft, signal_lft, num_lft = get_signal(np.transpose(dst[:, :search_range_h]), height,
-                                                                      search_width_h)
-        internal_rht, start_end_rht, signal_rht, num_rht = get_signal(np.transpose(dst[:, -search_range_h:]),
-                                                                      height, search_width_h)
+        internal_top, num_top = get_signal(dst[:search_range_w, :], width, search_width_w)
+        internal_btm, num_btm = get_signal(dst[-search_range_w:, :], width, search_width_w)
+        internal_lft, num_lft = get_signal(np.transpose(dst[:, :search_range_h]), height, search_width_h)
+        internal_rht, num_rht = get_signal(np.transpose(dst[:, -search_range_h:]), height, search_width_h)
 
         four_egde = sorted([num_top, num_btm, num_lft, num_rht])
         sort_index = np.argsort(np.array([num_top, num_btm, num_lft, num_rht]))
@@ -139,10 +131,10 @@ def dm_line_cycle_decoder( dm_image, output_dir, zxing_enable=True, **kwargs):
                 # |    |
                 # #----#
                 if abs(large_lr - small_lr * 2) == 0:
-                    grid_num = POSSIBLE_RECT_SIZE[np.argmin(abs(POSSIBLE_RECT_SIZE[:, 0] - large_lr))]
+                    grid_num = POSSIBLE_RECT_SIZE[np.argmin(abs(POSSIBLE_RECT_SIZE[:, 1] - large_lr))]
 
                 elif abs(large_ud - small_ud * 2) == 0:
-                    grid_num = POSSIBLE_RECT_SIZE[np.argmin(abs(POSSIBLE_RECT_SIZE[:, 1] - large_ud))]
+                    grid_num = POSSIBLE_RECT_SIZE[np.argmin(abs(POSSIBLE_RECT_SIZE[:, 0] - large_ud))]
 
                 else:  # 最差的结果:直接取长边。
                     index = np.argmin(abs(np.concatenate(
@@ -150,10 +142,9 @@ def dm_line_cycle_decoder( dm_image, output_dir, zxing_enable=True, **kwargs):
                             POSSIBLE_RECT_SIZE.shape[0]
                     grid_num = POSSIBLE_RECT_SIZE[index]
 
-                grid_num = [grid_num[0], grid_num[1]]
+                grid_num = [grid_num[1], grid_num[0]]
 
         inverse = False
-        # print(grid_num)
         # draw a pseudo binary code.
         if min(grid_num) >= 4:
             grid_size_y = height / grid_num[0]
@@ -171,17 +162,15 @@ def dm_line_cycle_decoder( dm_image, output_dir, zxing_enable=True, **kwargs):
                         int(j * grid_size_x) + x_offset:int((j + 1) * grid_size_x) - x_offset])
 
             mean_val = np.mean(sample_val)
-            mean_border = (np.mean(sample_val[0, :]) + np.mean(sample_val[:, 0]) + \
+            mean_border = (np.mean(sample_val[0, :]) + np.mean(sample_val[:, 0]) +
                            np.mean(sample_val[-1, :]) + np.mean(sample_val[:, -1])) / 4
             # DOTO: 是否是dash需要判断。
             num_white_points = len(sample_val[0, :][sample_val[0, :] > mean_border]) + \
                                len(sample_val[:, 0][sample_val[:, 0] > mean_border]) + \
                                len(sample_val[-1, :][sample_val[-1, :] > mean_border]) + \
                                len(sample_val[:, -1][sample_val[:, -1] > mean_border])
-            # print(num_white_points)
             if num_white_points > grid_num[0] + grid_num[1]:
                 inverse = True
-            # print(inverse)
 
             for i in range(grid_num[0]):
                 for j in range(grid_num[1]):
@@ -202,7 +191,6 @@ def dm_line_cycle_decoder( dm_image, output_dir, zxing_enable=True, **kwargs):
             border_type = ['d', 'd', 'd', 'd']
             split_point = np.zeros(4)
             # top
-            # print(res_img[0, :], np.concatenate((res_img[0, :-1], np.zeros(1))))
             top_fake_border = res_img[0, :]
             split_point[0] = np.sum(np.abs(top_fake_border - np.concatenate((res_img[0, 1:], np.zeros(1)))) / 255)
             # bottom
@@ -219,7 +207,6 @@ def dm_line_cycle_decoder( dm_image, output_dir, zxing_enable=True, **kwargs):
 
             border_type[index[0]] = 'l'
             border_type[index[1]] = 'l'
-            # print(border_type, split_point)
             if border_type[0] == border_type[3] == 'l':
                 border_img = cv2.flip(border_img, 1)
             elif border_type[1] == border_type[2] == 'l':
@@ -235,7 +222,6 @@ def dm_line_cycle_decoder( dm_image, output_dir, zxing_enable=True, **kwargs):
             res_img[:, :8] = border_img[:, :8]
             res_img = cv2.copyMakeBorder(res_img, 50, 50, 50, 50, cv2.BORDER_CONSTANT, value=255)
             # barcode = self.zxing_reader.decode()
-
         # draw some lines to justify the hypothesis.
         dst = cv2.cvtColor(dst, cv2.COLOR_GRAY2BGR)
 
@@ -256,9 +242,6 @@ def dm_line_cycle_decoder( dm_image, output_dir, zxing_enable=True, **kwargs):
     return None
 
 
-
-
-
 def get_signal(img, length, search_width=4):
     fft_vote = np.zeros(length)
     signal = []
@@ -268,8 +251,7 @@ def get_signal(img, length, search_width=4):
         fft_vote += np.abs(sig_fft_y)
 
     candidates = cv2.flip(np.argsort(fft_vote[4:length // 2]), 0)[0:5] + 4
-    # print(candidates[0][0])
-    return length / candidates[0][0], [0, 0], signal, candidates[0][0]
+    return length / candidates[0][0], candidates[0][0]
 
 
 def get_intervals(ls, tolerance=5):

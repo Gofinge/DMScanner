@@ -258,6 +258,57 @@ def cal_iou(polygon_1, polygon_2):
     return intersect / union
 
 
+def generate_pyramid(src, num_pyramid_level):
+    pyramid = []
+    down = src.copy()
+    for i in range(num_pyramid_level):
+        if i == 0:
+            pyramid.append(down)
+        else:
+            down = cv2.pyrDown(down)
+            pyramid.append(down)
+    return pyramid
+
+
+def calc_abc_from_line_2d(x0, y0, x1, y1):
+    a = y0 - y1
+    b = x1 - x0
+    c = x0*y1 - x1*y0
+    return a, b, c
+
+
+def get_line_cross_point(line1, line2):
+    # x1y1x2y2
+    a0, b0, c0 = calc_abc_from_line_2d(*line1)
+    a1, b1, c1 = calc_abc_from_line_2d(*line2)
+    D = a0 * b1 - a1 * b0
+    if D == 0:
+        return None
+    x = (b0 * c1 - b1 * c0) / D
+    y = (a1 * c0 - a0 * c1) / D
+    # print(x, y)
+    return [x, y]
+
+
+def angle_points(point1, point2, point3, point4):
+    vector_1 = np.array([point1[0][0] - point2[0][0],
+                        point1[0][1] - point2[0][1]])
+    vector_2 = np.array([point3[0][0] - point4[0][0],
+                        point3[0][1] - point4[0][1]])
+    cos = vector_1.dot(vector_2)/(np.linalg.norm(vector_1) * np.linalg.norm(vector_2))
+    # print(point1, point2, point3, point4, cos)
+    if cos > 1:
+        cos = 1
+    elif cos < -1:
+        cos = -1
+    return np.arccos(cos)
+
+
+def distance_points(point1, point2):
+    return np.sqrt((point1[0][0] - point2[0][0])**2 +\
+                   (point1[0][1] - point2[0][1])**2)
+
+
 class TqdmBar(object):
     def __init__(self, data_loader,
                  total=0, description='', position=0, leave=False, use_bar=True):
